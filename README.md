@@ -14,7 +14,7 @@ An AI-powered document assistant that uses RAG (Retrieval Augmented Generation) 
 ## Prerequisites
 
 - Python 3.8 or higher
-- Ollama (with Llama 2 model installed)
+- Ollama (with Llama 3.2 model installed)
 - Git (for cloning the repository)
 
 ## Installation

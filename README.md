@@ -6,7 +6,7 @@ An AI-powered document assistant that uses RAG (Retrieval Augmented Generation) 
 
 - 📄 PDF document processing and analysis
 - 🔍 Vector-based document retrieval using ChromaDB
-- 🤖 LLM-powered question answering using Llama 2
+- 🤖 LLM-powered question answering using Llama 3.2
 - 💻 Interactive web interface
 - ⚡ Real-time response streaming with typewriter effect
 - 🎨 Modern, responsive UI design

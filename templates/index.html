@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Chat Bubble</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+<body>
+    <!-- Floating chat button -->
+    <div class="chat-bubble-button" id="chatBubbleButton">💬</div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <h2>DPWH Bidding Assistant</h2>
+            <button class="close-chat" id="closeChat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message system">
+                Welcome! I'm here to help you with questions about the DPWH bidding document. 
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <textarea 
+                id="userInput" 
+                placeholder="Type your question here..."
+                rows="2"
+            ></textarea>
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatBubbleButton = document.getElementById('chatBubbleButton');
+        const closeChat = document.getElementById('closeChat');
+
+        let hasGreeted = false; // Track if greeting has been shown
+
+        // Toggle chat on button click
+        chatBubbleButton.addEventListener('click', () => {
+            chatContainer.classList.toggle('open');
+            
+            // If the chat is opened for the first time, greet the user
+            if (chatContainer.classList.contains('open') && !hasGreeted) {
+                addMessage("Hi! How can I help you today?", 'assistant');
+                hasGreeted = true;
+            }
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatContainer.classList.remove('open');
+        });
+
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = marked.parse(content);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addLoadingMessage() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant loading';
+            
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'loading-dots';
+            
+            const dot1 = document.createElement('span');
+            dot1.textContent = '.';
+            
+            const dot2 = document.createElement('span');
+            dot2.className = 'dot2';
+            dot2.textContent = '.';
+            
+            const dot3 = document.createElement('span');
+            dot3.className = 'dot3';
+            dot3.textContent = '.';
+            
+            dotsContainer.appendChild(dot1);
+            dotsContainer.appendChild(dot2);
+            dotsContainer.appendChild(dot3);
+
+            loadingDiv.textContent = 'Thinking';
+            loadingDiv.appendChild(dotsContainer);
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return loadingDiv;
+        }
+
+        function typewriterEffect(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            let index = 0;
+            const typingSpeed = 10; // typing speed
+            const typingInterval = setInterval(() => {
+                messageDiv.textContent = content.slice(0, index);
+                index++;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                if (index > content.length) {
+                    clearInterval(typingInterval);
+                    // After finishing typing raw text, parse it as markdown
+                    messageDiv.innerHTML = marked.parse(content);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, typingSpeed);
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            // Add loading message (assistant "thinking")
+            const loadingMessage = addLoadingMessage();
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: message })
+                });
+
+                const data = await response.json();
+
+                // Remove the loading message
+                if (loadingMessage) {
+                    chatMessages.removeChild(loadingMessage);
+                }
+
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'error');
+                } else {
+                    // Use typewriter effect for the assistant's response
+                    typewriterEffect(data.answer, 'assistant');
+                }
+            } catch (error) {
+                if (loadingMessage) {
+                    chatMessages.removeChild(loadingMessage);
+                }
+                addMessage('Sorry, there was an error processing your request.', 'error');
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

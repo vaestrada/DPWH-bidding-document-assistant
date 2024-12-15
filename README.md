@@ -21,7 +21,7 @@ An AI-powered document assistant that uses RAG (Retrieval Augmented Generation) 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/dpwh-bidding-document-assistant.git
+git clone https://github.com/vaestrada/dpwh-bidding-document-assistant.git
 cd dpwh-bidding-document-assistant
 ```
 

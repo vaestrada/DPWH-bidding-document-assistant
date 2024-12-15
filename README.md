@@ -1,6 +1,6 @@
 # DPWH Bidding Assistant
 
-An AI-powered document assistant that uses RAG (Retrieval Augmented Generation) to answer questions about DPWH bidding documents. Built with Llama 2, ChromaDB, and Flask.
+An AI-powered document assistant that uses RAG (Retrieval Augmented Generation) to answer questions about DPWH bidding documents. Built with Llama 3.2, ChromaDB, and Flask.
 
 ## Features
 

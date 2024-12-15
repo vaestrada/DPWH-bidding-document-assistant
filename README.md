@@ -44,7 +44,7 @@ pip install -r requirements.txt
 4. Install and run Ollama:
 ```bash
 # Follow instructions at https://ollama.ai/download
-# Then pull the Llama 2 model:
+# Then download the Llama 3.2 model:
 ollama run llama3.2
 ```
 
